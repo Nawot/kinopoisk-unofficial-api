@@ -33,7 +33,7 @@ client = KPClient(<your token>)
 
 When you have client you can used all functional this library.
 
-**Getting movie**
+### Getting movie
 
 ```python
 matrix = await client.get_movie_data(301)
@@ -58,7 +58,7 @@ answer = await client.search_movie('Mr. Robot')
 mr_robot = answer[0] # If you search popular movie, that usually this movie should be to first
 ```
 
-**Getting data of movie**
+### Getting data of movie
 In previous example we got tv series. By default it take without it seasons. That load it you should get it id and call to method of client  ***get_seasons_data***
 
 ```python
@@ -87,14 +87,14 @@ for season in mr_robot:
 		# First episode named 'eps1.0_hellofriend.mov'
 ```
 
-**Getting facts and bloopers of movie**
+### Getting facts and bloopers of movie
 
 ```python
 for fact in await client.get_facts(mr_robot.id.kinopoisk):
 	print(fact.text)
 ```
 
-**Getting persons**
+### Getting persons
 
 ```python
 bc = (await client.search_person('Benedict Cumberbatch'))[0]
@@ -114,7 +114,7 @@ for person in persons:
 for actor in actors[:10]: print(f'{actor.name.en}: {actor.character}')
 ```
 
-**Getting reviews**
+### Getting reviews
 
 ```python
 reviews = await mr_robot.get_reviews(client)
