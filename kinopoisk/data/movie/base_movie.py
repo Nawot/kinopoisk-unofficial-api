@@ -41,14 +41,14 @@ class BaseMovie:
         self.__dict__.update(new_.__dict__)
 
 
-    async def get_reviews(self, client) -> (list[Review], None):
+    async def get_reviews(self, client, page : int=None) -> (list[Review], None):
         """
         Gets reviews of this movie.
         
         @param client: Client instance for delegating of methods.
         """
 
-        return await client.get_reviews(self.id.kinopoisk)
+        return await client.get_reviews(self.id.kinopoisk, page)
     
 
     async def get_persons(self, client) -> (list[Person], None):
