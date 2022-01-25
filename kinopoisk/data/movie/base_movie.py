@@ -30,11 +30,13 @@ class BaseMovie:
     async def get_all_data(self, client):
         """
         Movie may not have all data, this could be that movie may be take from various API methods, which have different return data details levels.
+        @warning: Movie instance changes after call this method to needed movie class e.g. been BaseMovie became Film. 
         
         @param client: Client instance for delegating of methods.
         """
 
         new_ = await client.get_movie_data(self.id.kinopoisk)
+        object.__setattr__(self, '__class__', new_.__class__)
         self.__dict__.update(new_.__dict__)
 
 
@@ -56,3 +58,13 @@ class BaseMovie:
         """
 
         return await client.get_persons_of_movie(self.id.kinopoisk)
+    
+
+    async def get_similars(self, client) -> (list[BaseMovie], None):
+        """
+        Gets persons of this movie.
+        
+        @param client: Client instance for delegating of methods.
+        """
+
+        return await client.get_similars(self.id.kinopoisk)
