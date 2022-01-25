@@ -3,6 +3,7 @@ import asyncio
 from kinopoisk.data.id import Id
 from kinopoisk.data.name import Name
 from kinopoisk.data.poster import Poster
+from kinopoisk.data.types import ImageTypes
 from dataclasses import dataclass
 
 
@@ -68,3 +69,13 @@ class BaseMovie:
         """
 
         return await client.get_similars(self.id.kinopoisk)
+    
+
+    async def get_images(self, client, type : ImageTypes=ImageTypes.frame, page : int=None) -> (list[BaseMovie], None):
+        """
+        Gets images of this movie.
+        
+        @param client: Client instance for delegating of methods.
+        """
+
+        return await client.get_images(self.id.kinopoisk, type, page)
