@@ -8,4 +8,5 @@ from .get_person_data import *
 from .search_person import *
 from .search_movie import *
 from .get_similars import *
+from .get_images import *
 from .some import *
