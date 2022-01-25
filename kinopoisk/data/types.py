@@ -13,3 +13,20 @@ class MovieTypes(enum.Enum):
 class FactTypes(enum.Enum):
     fact = 'FACT'
     blooper = 'BLOOPER'
+
+
+class ImageTypes(enum.Enum):
+
+    def __str__(self):
+        return self.value
+
+
+    frame = 'STILL'
+    back_stage = 'SHOOTING'
+    poster = 'POSTER'
+    fan_art = 'FAN_ART'
+    promo = 'PROMO'
+    concept_art = 'CONCEPT'
+    wallpaper = 'WALLPAPER'
+    cover = 'COVER'
+    screenshot = 'SCREENSHOT'

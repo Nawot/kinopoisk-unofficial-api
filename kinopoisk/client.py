@@ -6,8 +6,9 @@ from kinopoisk.data.blooper import Blooper
 from kinopoisk.data.box_office import BoxOffice
 from kinopoisk.data.review import Review
 from kinopoisk.data.person import Person
+from kinopoisk.data.poster import Poster
 from kinopoisk.data.movie import BaseMovie, Film, TVSeries, Season, Episode
-from kinopoisk.data.types import MovieTypes, FactTypes
+from kinopoisk.data.types import MovieTypes, FactTypes, ImageTypes
 from .errors import *
 
 
@@ -374,3 +375,35 @@ class KPClient:
             for movie in items:
                 movies.append(await KPClient.__create_movie_by_json(movie))
             return movies
+    
+
+    async def get_images(self, id : int, type : ImageTypes=ImageTypes.frame, page : int=None) -> (list[Poster], None):
+        """
+        Getting images such as frames, posters, wallpapers and more of movies by id from the API and returns it as a movies list.
+        
+        @param id: Id of the movie that data to be fetched.
+        @param type: Type of image. Type is a string enum named ImageTypes. Default frame
+        @param page: Used to get the next page of results.
+        @return: List of posters. If some error or not found that None.
+        """
+
+        version = '2.2'
+        query = ''
+        if type is not None:
+            query += f'type={type}&'
+        if page is not None:
+            query += f'page={page}&'
+
+        async with self.__session.get(f'{self.__base_url}{version}/films/{id}/images?{query}') as response:
+            code = response.status
+            if not await self.__check_status_code(code): return
+            
+            images = []
+            json = await response.json()
+            items = json.get('items')
+            if items is None or items == []: return
+            for image in items:
+                images.append(Poster(
+                    image.get('imageUrl'),
+                    image.get('previewUrl')))
+            return images
