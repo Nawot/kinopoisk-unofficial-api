@@ -195,7 +195,7 @@ class KPClient:
             return films
     
 
-    async def get_reviews(self, id, page : int=1) -> (list[Review], None):
+    async def get_reviews(self, id, page : int=None) -> (list[Review], None):
         """
         Gets reviews of movie by it id. Also takes page number.
         
@@ -203,9 +203,13 @@ class KPClient:
         @param page: Used to specify which page of results to getting data.
         @return: List of Review objects.
         """
+
+        query = ''
+        if page is not None:
+            query += f'page={page}&'
         
         version = '1'
-        async with self.__session.get(f'{self.__base_url}{version}/reviews?filmId={id}&page={page}') as response:
+        async with self.__session.get(f'{self.__base_url}{version}/reviews?filmId={id}&page={query}') as response:
             code = response.status
             if not await self.__check_status_code(code): return
             
