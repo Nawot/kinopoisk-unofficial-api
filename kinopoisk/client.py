@@ -6,7 +6,7 @@ from kinopoisk.data.blooper import Blooper
 from kinopoisk.data.box_office import BoxOffice
 from kinopoisk.data.review import Review
 from kinopoisk.data.person import Person
-from kinopoisk.data.movie import Film, TVSeries, Season, Episode
+from kinopoisk.data.movie import BaseMovie, Film, TVSeries, Season, Episode
 from kinopoisk.data.types import MovieTypes, FactTypes
 from .errors import *
 
@@ -55,7 +55,7 @@ class KPClient:
     
 
     @staticmethod
-    async def __create_movie_by_json(json : dict) -> (Film, TVSeries, None):
+    async def __create_movie_by_json(json : dict) -> (BaseMovie, Film, TVSeries, None):
         """
         Creates movie needed type e.g. Film or TVSiries.
 
@@ -63,13 +63,19 @@ class KPClient:
         @return movie or None if the movie of unsupported type
         """
 
+        movie = None
+        type = None
         try:
-            type = MovieTypes(json.get('type'))
-            if type is None:
-                type = MovieTypes.tv_series if json.get('serial') else MovieTypes.film
+            # Not always request have a type. The get_similars methods return without regular type but another type.
+            if json.get('relationType') == 'SIMILAR':
+                movie = await BaseMovie._create_from_json(json)
+            else:
+                type = MovieTypes(json.get('type'))
+                if type is None:
+                    type = MovieTypes.tv_series if json.get('serial') else MovieTypes.film
         except ValueError:
             return None
-        movie = None
+        
         if type == MovieTypes.film:
             movie = await Film._create_from_json(json)
         elif type == MovieTypes.tv_series:
@@ -347,3 +353,24 @@ class KPClient:
             if movies != []:
                 return movies
 
+
+    async def get_similars(self, id) -> (list[Film, TVSeries], None):
+        """
+        Getting similars movies by movie id from the API and returns it as a movies list.
+        
+        @param id: Id of the movie that data to be fetched.
+        @return: film, tv series. If some error that None.
+        """
+
+        version = '2.2'
+        async with self.__session.get(f'{self.__base_url}{version}/films/{id}/similars') as response:
+            code = response.status
+            if not await self.__check_status_code(code): return
+            
+            movies = []
+            json = await response.json()
+            items = json.get('items')
+            if items is None or items == []: return
+            for movie in items:
+                movies.append(await KPClient.__create_movie_by_json(movie))
+            return movies

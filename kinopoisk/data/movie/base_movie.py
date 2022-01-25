@@ -1,6 +1,8 @@
 from __future__ import annotations
 import asyncio
 from kinopoisk.data.id import Id
+from kinopoisk.data.name import Name
+from kinopoisk.data.poster import Poster
 from dataclasses import dataclass
 
 
@@ -9,6 +11,20 @@ class BaseMovie:
     """Base class with general methods"""
     
     id : Id = None
+    name : Name = None
+    poster : Poster = None
+
+
+    @staticmethod
+    async def _create_from_json(json : dict) -> BaseMovie:
+        movie = BaseMovie(
+            id=Id(
+                json.get('kinopoiskId') if json.get('kinopoiskId') is not None else json.get('filmId'),
+                json.get('imdbId')),
+            name=Name(original=json.get('nameOriginal'), en=json.get('nameEn'), ru=json.get('nameRu')),
+            poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview'))
+            )
+        return movie
 
 
     async def get_all_data(self, client):
