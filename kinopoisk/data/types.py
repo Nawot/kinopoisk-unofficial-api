@@ -2,6 +2,10 @@ import enum
 
 
 class MovieTypes(enum.Enum):
+
+    def __str__(self):
+        return self.value
+
     film = 'FILM'
     video = 'VIDEO'
     tv_series = 'TV_SERIES'
@@ -11,6 +15,10 @@ class MovieTypes(enum.Enum):
 
 
 class FactTypes(enum.Enum):
+    
+    def __str__(self):
+        return self.value
+
     fact = 'FACT'
     blooper = 'BLOOPER'
 
