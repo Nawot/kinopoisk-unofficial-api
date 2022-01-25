@@ -354,7 +354,7 @@ class KPClient:
                 return movies
 
 
-    async def get_similars(self, id) -> (list[Film, TVSeries], None):
+    async def get_similars(self, id) -> (list[BaseMovie], None):
         """
         Getting similars movies by movie id from the API and returns it as a movies list.
         
