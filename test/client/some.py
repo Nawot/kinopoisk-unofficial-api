@@ -29,8 +29,26 @@ class TestSome(aiounittest.AsyncTestCase):
             await client.get_movie_data(301) 
     
 
-    async def test__create_movie_from_json(self):
+
+class CreateMovieFromJson(aiounittest.AsyncTestCase):
+
+    def setUp(self):
+        self.client = kinopoisk.client.KPClient(token)
+
+
+    def get_event_loop(self):
+        self.loop = asyncio.get_event_loop()
+        return self.loop
+
+
+    async def test_type(self):
         response = await self.client.get_movie_data(301)
         self.assertIsInstance(response, Film)
         response = await self.client.get_movie_data(178707)
         self.assertIsInstance(response, TVSeries)
+    
+
+    async def test_incorect_incoming_data(self):
+        for i in (True, False, 'fjdalj', -439, self.client, self):
+            response = await self.client._KPClient__create_movie_by_json(i)
+            self.assertIsNone(response)

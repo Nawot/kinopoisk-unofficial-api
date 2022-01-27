@@ -58,7 +58,7 @@ class KPClient:
     @staticmethod
     async def __create_movie_by_json(json : dict) -> (BaseMovie, Film, TVSeries, None):
         """
-        Creates movie needed type e.g. Film or TVSiries.
+        Creates movie needed type e.g. Film, TVSiries or BaseMovie.
 
         @param json: This is dict return of server.
         @return movie or None if the movie of unsupported type
@@ -67,14 +67,16 @@ class KPClient:
         movie = None
         type = None
         try:
-            # Not always request have a type. The get_similars methods return without regular type but another type.
-            if json.get('relationType') == 'SIMILAR':
-                movie = await BaseMovie._create_from_json(json)
+            type = json.get('type')
+            if type is None:
+                is_serial = json.get('serial')
+                if is_serial is not None:
+                    type = MovieTypes.tv_series if is_serial else MovieTypes.film
+                else:
+                    movie = await BaseMovie._create_from_json(json)
             else:
-                type = MovieTypes(json.get('type'))
-                if type is None:
-                    type = MovieTypes.tv_series if json.get('serial') else MovieTypes.film
-        except ValueError:
+                type = MovieTypes(type)
+        except AttributeError:
             return None
         
         if type == MovieTypes.film:
