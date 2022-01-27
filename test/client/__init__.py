@@ -7,6 +7,7 @@ from .get_persons_of_movie import *
 from .get_person_data import *
 from .search_person import *
 from .search_movie import *
+from .search_movie_by_keyword import *
 from .get_similars import *
 from .get_images import *
 from .some import *

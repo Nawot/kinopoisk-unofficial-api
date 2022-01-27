@@ -359,6 +359,52 @@ class KPClient:
                 if movie is not None: movies.append(movie)
             if movies != []:
                 return movies
+    
+
+    async def search_movie_by_keyword(
+        self,
+        keyword : str=None,
+        page : int=None
+    ) -> (Film, TVSeries, None):
+        """
+        Searches for a movie by only keyword.
+        If the search is successful it returns a list of movies that match the criteria.
+        This better way that search movie if you want search only by keyword.
+        
+        For some reason this api method search better. It looks like it has better fuzzy recognition.
+        Little bit story. You wallkin on internet and suddenly want to search new film about spider man, but you not knouw how exact it named. You use method search_movie with keyword param "spider man can't going to home", yet it not result returning. You sadnes. Yet you remember that there is method search_by_keyword and you think "May be this will work?". You callin this method and oh miracle. This works 
+        
+        @param keyword: Keyword by which you want get movie.
+        @param page: Used to get the next page of results.
+        @return: List of movies that match the given criteria. None if some errors.
+        """
+        version = '2.1'
+        query = ''
+        if keyword is not None:
+            query += f'keyword={keyword}&'
+        if page is not None:
+            query += f'page={page}&'
+        
+        if type is not None:
+            if type in (MovieTypes.all, MovieTypes.film, MovieTypes.tv_show):
+                query += f'type={type}&'
+            else:
+                is_unsupported_type = True
+
+        async with self.__session.get(f'{self.__base_url}{version}/films/search-by-keyword?{query}') as response:
+            code = response.status
+            if not await self.__check_status_code(code): return
+            
+            movies = []
+            json = await response.json()
+            items = json.get('films')
+            if items is None: return
+            for item in items:
+                movie = await self.__create_movie_by_json(item)
+                # If movie unsupported type, returned None, so not appending this to result.
+                if movie is not None: movies.append(movie)
+            if movies != []:
+                return movies
 
 
     async def get_similars(self, id) -> (list[BaseMovie], None):
