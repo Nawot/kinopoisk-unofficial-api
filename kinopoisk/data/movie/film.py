@@ -11,6 +11,7 @@ from kinopoisk.data.description import Description
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
+import kinopoisk.utils as utils
 
 
 @dataclass(frozen=True)
@@ -56,7 +57,7 @@ class Film(BaseMovie):
                 json.get('webUrl') if json.get('webUrl') is not None else f'https://www.kinopoisk.ru/film/{json.get("kinopoiskId")}/',
                 f'https://www.imdb.com/title/{json.get("imdbId")}/' if json.get("imdbId") is not None else None),
             year=json.get('year'),
-            length=json.get('filmLength'),
+            length=json.get('filmLength') if not isinstance(json.get('filmLength'), str) else sum(await utils.time_to_minute(json.get('filmLength'))),
             slogan=json.get('slogan'),
             description=Description(
                 json.get('description'),
