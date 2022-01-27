@@ -51,7 +51,9 @@ class TVSeries(BaseMovie):
     @staticmethod
     async def _create_from_json(json : dict)-> TVSeries:
         tv_series = TVSeries(
-            id=Id(json.get('kinopoiskId'), json.get('imdbId')),
+            id=Id(
+                json.get('kinopoiskId') if json.get('kinopoiskId') is not None else json.get('filmId'),
+                json.get('imdbId')),
             name=Name(original=json.get('nameOriginal'), en=json.get('nameEn'), ru=json.get('nameRu')),
             poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview')),
             raiting=Raiting(
