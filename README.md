@@ -121,3 +121,64 @@ reviews = await mr_robot.get_reviews(client)
 for review in reviews: print(f'{review.author} - {review.title}:\n{review.text}')
 ```
 
+### Getting similars movies
+
+```python
+movies = await mr_robot.get_similars(client)
+for movie in movies:
+    print(movie.name.en)
+```
+
+```
+Fight Club
+Who Am I - Kein System ist sicher
+The Matrix
+Dexter
+A Beautiful Mind
+Hackers
+The Social Network
+The Fifth Estate
+V for Vendetta
+Black Mirror
+23
+```
+
+### Getting images
+
+You can get different images e.g. posters wallpapers, backstage photo and more
+
+```python
+images = await mr_robot.get_images(client, ImageTypes.poster)
+for image in images:
+    print(image.big)
+```
+
+<p style="display: flex;">
+	<img height=250 src="https://avatars.mds.yandex.net/get-kinopoisk-image/1704946/981bdebd-d27d-4ea4-85eb-9c51c0bd678b/orig" />
+	<img height=250 src="https://avatars.mds.yandex.net/get-kinopoisk-image/1704946/cc2adcad-a448-42b1-a329-c6c222b047af/orig" /> 
+	<img height=250 src="https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/f69aae71-cb44-432e-aaf5-657e551b018d/orig" />
+	<img height=250 src="https://avatars.mds.yandex.net/get-kinopoisk-image/1898899/49853c24-b2b2-4698-9b3a-74e6ef0e37b6/orig">
+</p>
+### Getting some tops
+
+**Best 250**
+
+```python
+for movie in (await client.get_top(TopTypes.best_250))[:5]:
+	print(movie.name.en)
+```
+
+**Popular 100**
+
+```python
+for movie in (await client.get_top(TopTypes.popular_100))[:5]:
+	print(movie.name.en)
+```
+
+**Future**
+
+```python
+for movie in (await client.get_top(TopTypes.best_250))[:5]:
+	print(movie.name.en)
+```
+
