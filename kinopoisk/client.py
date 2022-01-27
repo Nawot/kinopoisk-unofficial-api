@@ -305,6 +305,8 @@ class KPClient:
         """
         Searches for a movie by keyword, year of release, rating and type.
         If the search is successful it returns a list of movies that match the criteria.
+
+        If you use only keyword (if only with page) better way call another method named search_movie_by_keyword. Any way, this method calls that method, if so
         
         @param keyword: Keyword by which you want get movie.
         @param year_from: Start year of a movie.
@@ -317,19 +319,28 @@ class KPClient:
         """
         version = '2.2'
         is_unsupported_type = False 
+        is_only_keyword = False
         query = ''
         if keyword is not None:
             query += f'keyword={keyword}&'
+            is_only_keyword = True
         if year_from is not None:
             query += f'yearFrom={year_from}&'
+            is_only_keyword = False
         if year_to is not None:
             query += f'yearTo={year_to}&'
+            is_only_keyword = False
         if rating_from is not None:
             query += f'ratingFrom={rating_from}&'
+            is_only_keyword = False
         if rating_to is not None:
             query += f'ratingTo={rating_to}&'
+            is_only_keyword = False
         if page is not None:
             query += f'page={page}&'
+        
+        if is_only_keyword:
+            return await self.search_movie_by_keyword(keyword=keyword, page=page)
         
         if type is not None:
             if type in (MovieTypes.all, MovieTypes.film, MovieTypes.tv_show):
