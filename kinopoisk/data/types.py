@@ -38,3 +38,14 @@ class ImageTypes(enum.Enum):
     wallpaper = 'WALLPAPER'
     cover = 'COVER'
     screenshot = 'SCREENSHOT'
+
+
+class TopTypes(enum.Enum):
+
+    def __str__(self):
+        return self.value
+
+
+    best_250 = 'TOP_250_BEST_FILMS'
+    popular_100 = 'TOP_100_POPULAR_FILMS'
+    future = 'TOP_AWAIT_FILMS'

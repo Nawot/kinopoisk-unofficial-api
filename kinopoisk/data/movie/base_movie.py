@@ -5,6 +5,8 @@ from kinopoisk.data.name import Name
 from kinopoisk.data.poster import Poster
 from kinopoisk.data.types import ImageTypes
 from dataclasses import dataclass
+from dataclasses import field
+import kinopoisk.utils as utils
 
 
 @dataclass(frozen=True)
@@ -14,6 +16,10 @@ class BaseMovie:
     id : Id = None
     name : Name = None
     poster : Poster = None
+    year : int = None
+    length : int = None
+    countries : list[str] = field(default_factory=list)
+    genres : list[str] = field(default_factory=list)
 
 
     @staticmethod
@@ -23,8 +29,12 @@ class BaseMovie:
                 json.get('kinopoiskId') if json.get('kinopoiskId') is not None else json.get('filmId'),
                 json.get('imdbId')),
             name=Name(original=json.get('nameOriginal'), en=json.get('nameEn'), ru=json.get('nameRu')),
-            poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview'))
-            )
+            poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview')),
+            year=int(json.get('year')) if json.get('year') is not None else None,
+            length=json.get('filmLength') if not isinstance(json.get('filmLength'), str) else sum(await utils.time_to_minute(json.get('filmLength'))),
+            countries=([i['country'] for i in json.get('countries')] if json.get('countries') is not None else None),
+            genres=([i['genre'] for i in json.get('genres')] if json.get('genres') is not None else None)
+            ) 
         return movie
 
 

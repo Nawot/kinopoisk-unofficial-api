@@ -8,7 +8,7 @@ from kinopoisk.data.review import Review
 from kinopoisk.data.person import Person
 from kinopoisk.data.poster import Poster
 from kinopoisk.data.movie import BaseMovie, Film, TVSeries, Season, Episode
-from kinopoisk.data.types import MovieTypes, FactTypes, ImageTypes
+from kinopoisk.data.types import MovieTypes, FactTypes, ImageTypes, TopTypes
 from .errors import *
 
 
@@ -413,3 +413,33 @@ class KPClient:
                     image.get('imageUrl'),
                     image.get('previewUrl')))
             return images
+    
+
+    async def get_top(self, type : TopTypes=TopTypes.best_250, page=None) -> (list[Film, TVSeries], None):
+        """
+        Getting movies in some tops such as best 250, 100 popular and future by type from the API and returns it as a movies list.
+        
+        @param type: Type of tops. Type is a string enum named TopTypes. Default best_250
+        @param page: Used to get the next page of results.
+        @return: List of movies. If some error or not found that None.
+        """
+
+        version = '2.2'
+        query = ''
+        if type is not None:
+            query += f'type={type}&'
+        if page is not None:
+            query += f'page={page}&'
+        
+
+        async with self.__session.get(f'{self.__base_url}{version}/films/top?{query}') as response:
+            code = response.status
+            if not await self.__check_status_code(code): return
+            
+            movies = []
+            json = await response.json()
+            items = json.get('films')
+            if items is None or items == []: return
+            for movie in items:
+                movies.append(await self.__create_movie_by_json(movie))
+            return movies
