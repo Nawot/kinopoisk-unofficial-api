@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "kinopoisk-unofficial-api"
-version = "0.6.4"
+version = "0.6.5"
 description = "Simple wrapper of kinopoiskapiunofficial.tech"
 authors = ["Nawot <Nawot001@gmail.com>"]
 packages = [{include = "kinopoisk" }]
