@@ -3,6 +3,7 @@ import asyncio
 from kinopoisk.data.id import Id
 from kinopoisk.data.name import Name
 from kinopoisk.data.poster import Poster
+from kinopoisk.data.url import Url
 from kinopoisk.data.types import ImageTypes
 from dataclasses import dataclass
 from dataclasses import field
@@ -18,6 +19,7 @@ class BaseMovie:
     poster : Poster = None
     year : int = None
     length : int = None
+    url : Url = None
     countries : list[str] = field(default_factory=list)
     genres : list[str] = field(default_factory=list)
 
@@ -32,6 +34,9 @@ class BaseMovie:
             poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview')),
             year=int(json.get('year')) if json.get('year') is not None else None,
             length=json.get('filmLength') if not isinstance(json.get('filmLength'), str) else sum(await utils.time_to_minute(json.get('filmLength'))),
+            url=Url(
+                json.get('webUrl') if json.get('webUrl') is not None else f'https://www.kinopoisk.ru/film/{json.get("kinopoiskId") or json.get("filmId")}/',
+                f'https://www.imdb.com/title/{json.get("imdbId")}/' if json.get("imdbId") is not None else None),
             countries=([i['country'] for i in json.get('countries')] if json.get('countries') is not None else None),
             genres=([i['genre'] for i in json.get('genres')] if json.get('genres') is not None else None)
             ) 

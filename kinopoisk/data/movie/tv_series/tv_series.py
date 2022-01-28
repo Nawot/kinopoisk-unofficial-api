@@ -65,7 +65,7 @@ class TVSeries(BaseMovie):
                 await_=RaitingData(json.get('ratingAwait'), json.get('ratingAwaitCount')), 
                 rf_critics=RaitingData(json.get('ratingRfCritics'), json.get('ratingRfCriticsVoteCount'))),
             url=Url(
-                json.get('webUrl') if json.get('webUrl') is not None else f'https://www.kinopoisk.ru/film/{json.get("kinopoiskId")}/',
+                json.get('webUrl') if json.get('webUrl') is not None else f'https://www.kinopoisk.ru/film/{json.get("kinopoiskId") or json.get("filmId")}/',
                 f'https://www.imdb.com/title/{json.get("imdbId")}/' if json.get("imdbId") is not None else None),
             year=json.get('year'),
             length=json.get('filmLength') if not isinstance(json.get('filmLength'), str) else sum(await utils.time_to_minute(json.get('filmLength'))),
