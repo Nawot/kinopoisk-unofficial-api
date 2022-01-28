@@ -59,7 +59,7 @@ class TVSeries(BaseMovie):
             poster=Poster(json.get('posterUrl'), json.get('posterUrlPreview')),
             raiting=Raiting(
                 good_review=RaitingData(json.get('ratingGoodReview'), json.get('ratingGoodReviewVoteCount')),
-                kinopoisk=RaitingData(json.get('ratingKinopoisk'), json.get('ratingKinopoiskVoteCount')),
+                kinopoisk=RaitingData(json.get('ratingKinopoisk') or json.get('rating'), json.get('ratingKinopoiskVoteCount') or json.get('ratingVoteCount')),
                 imdb=RaitingData(json.get('ratingImdb'), json.get('ratingImdbVoteCount')),
                 film_critics=RaitingData(json.get('ratingFilmCritics'), json.get('ratingFilmCriticsVoteCount')),
                 await_=RaitingData(json.get('ratingAwait'), json.get('ratingAwaitCount')), 
