@@ -9,6 +9,7 @@ from kinopoisk.data.person import Person
 from kinopoisk.data.poster import Poster
 from kinopoisk.data.movie import BaseMovie, Film, TVSeries, Season, Episode
 from kinopoisk.data.types import MovieTypes, FactTypes, ImageTypes, TopTypes
+from kinopoisk.data.filters import Country, Genre
 from .errors import *
 
 
@@ -16,11 +17,11 @@ class KPClient:
     """Simple API wrapper for getting data."""
 
     __base_url = 'https://kinopoiskapiunofficial.tech/api/v'
+    filters = None
 
     def __init__(self, token : str):
         self.__session = aiohttp.ClientSession(
             headers={'X-API-KEY': token, 'accept': 'application/json'})
-    
 
     def __del__(self):
         try:
@@ -299,6 +300,8 @@ class KPClient:
         year_to : int=None,
         rating_from : int=None,
         rating_to : int=None,
+        genres : list[int]=None,
+        countries : list[int]=None,
         type : MovieTypes=None,
         page : int=None
     ) -> (Film, TVSeries, None):
@@ -313,6 +316,8 @@ class KPClient:
         @param year_to: End year of a movie.
         @param rating_from: Filter out movies with a rating lower than this value.
         @param rating_to: Filter out movies with rating less than this value.
+        @param genres: List of genres for filter movie. Now API support only one genre.
+        @param countries: List of countries for filter movie. Now API support only one genre.
         @param type: Type of movie. Type is a string enum named MovieTypes 
         @param page: Used to get the next page of results.
         @return: List of movies that match the given criteria. None if some errors.
@@ -321,23 +326,32 @@ class KPClient:
         is_unsupported_type = False 
         is_only_keyword = False
         query = ''
-        if keyword is not None:
-            query += f'keyword={keyword}&'
-            is_only_keyword = True
-        if year_from is not None:
-            query += f'yearFrom={year_from}&'
-            is_only_keyword = False
-        if year_to is not None:
-            query += f'yearTo={year_to}&'
-            is_only_keyword = False
-        if rating_from is not None:
-            query += f'ratingFrom={rating_from}&'
-            is_only_keyword = False
-        if rating_to is not None:
-            query += f'ratingTo={rating_to}&'
-            is_only_keyword = False
-        if page is not None:
-            query += f'page={page}&'
+        try:
+            if keyword is not None:
+                query += f'keyword={keyword}&'
+                is_only_keyword = True
+            if year_from is not None:
+                query += f'yearFrom={year_from}&'
+                is_only_keyword = False
+            if year_to is not None:
+                query += f'yearTo={year_to}&'
+                is_only_keyword = False
+            if rating_from is not None:
+                query += f'ratingFrom={rating_from}&'
+                is_only_keyword = False
+            if rating_to is not None:
+                query += f'ratingTo={rating_to}&'
+                is_only_keyword = False
+            if genres is not None:
+                query += f'genres={",".join([str(i) for i in genres])}&'
+                is_only_keyword = False
+            if countries is not None:
+                query += f'countries={",".join([str(i) for i in countries])}&'
+                is_only_keyword = False
+            if page is not None:
+                query += f'page={page}&'
+        except TypeError:
+            return
         
         if is_only_keyword:
             return await self.search_movie_by_keyword(keyword=keyword, page=page)
@@ -500,3 +514,35 @@ class KPClient:
             for movie in items:
                 movies.append(await self.__create_movie_by_json(movie))
             return movies
+
+
+    async def load_filters(self) -> None: 
+        """
+        Getting some filters e.g. genres, countries for search_movie method from the API.
+        """
+
+        version = '2.2'
+
+        async with self.__session.get(f'{self.__base_url}{version}/films/filters') as response:
+            code = response.status
+            if not await self.__check_status_code(code): return
+            
+            filters = {}
+            genres = []
+            countries = []
+
+            json = await response.json()
+            genre_items = json.get('genres')
+            if genre_items is None or genre_items == []: return
+            for item in genre_items:
+                genres.append(Genre(item.get('id'), item.get('genre')))
+            country_items = json.get('countries')
+            if country_items is None or country_items == []: return
+            for item in country_items:
+                countries.append(Country(item.get('id'), item.get('country')))
+
+            filters['genres'] = genres
+            filters['countries'] = countries
+
+            KPClient.filters = filters
+

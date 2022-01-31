@@ -45,7 +45,7 @@ class TestSearchMovie(aiounittest.AsyncTestCase):
     
     async def test_incorect_incoming_data(self):
         for i in (-439, self.client, self):
-            response = await self.client.search_movie(i, i, i, i, i, i)
+            response = await self.client.search_movie(i, i, i, i, i, i, i, i)
             self.assertIsNone(response)
 
 
